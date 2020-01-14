@@ -1,0 +1,90 @@
+1、对遥感影像进行切片：geoserver切片，用openlayers进行访问的时候出现位置偏移。且不同等级下位置偏移量不同，应该是切片时设置参数有问题，暂且不知如何设置。但可以通过js显示时修改origin可以调整位置，不过需要一点点试。
+2、学习使用cesium：在三维视窗中编辑点线面。
+3、空天图系统，影像对比功能，可以选择不同时期影像进行对比。
+
+11-08 周五
+1、早上安装上Android studio，创建项目失败，暂时不知道原因。想学一下Android系统下的gis；将osgearth编译到Android系统上运行。
+2、用ArcGIS剪切无人机图像，然后进行拼接；ArcGIS运行很慢，一上午只剪切三幅影像。
+3、利用Openlayers打开本地json以及kml文件，并在地图上显示。
+4、自己对于技术了解太表面，没有深入，需要多看源码。
+
+11-09 周六(加班)
+1、今天需要实现病树在地图上显示，以及点击病树弹出对话框，显示病树的坐标以及图片等信息。在地图上点击可以获取点击的feature，通过像素坐标将其转换为地理坐标，看了源码，没找到具体函数。
+2、react生命周期，先运行子组件的componentDidMount然后在运行父组件的componentDidMount，子组件的运行顺序和在父组件的排列顺序有关，排在前的先运行。
+
+11-13 周三
+1、geoserver切片，将切片大小设为256时，没有出现位置偏移，不知道对其他影像是不是也是这样。但是256每一幅图片在100k-200k之间，加载缓慢。百度与谷歌都是采用jpg格式且大小也为256，由于我们的图片一小部分，所有使用jpg会出现背景不透明；且调研说对png进行gzip压缩效果不好。
+2、在看geotools源码。java中的set集合是一个借口，具体实现主要有hashset以及treeset。set不允许相同元素存在且是无序的。hashset主要实例化了一个hashmap实现set的具体操作。
+
+11-14 周四
+1、学习mapbox for Android，在Android显示地图。在Linux下Android studio adb 不允许访问设备，需要编辑/etc/udev/rules.d/51-android.rules 然后就可以利用adb访问Android设备。
+2、在Android中采用java语言访问服务器端的json数据，不能直接http访问，需要https或是配置xml文件，才能获取到json字符串数据，然后将其转换为json格式，在地图上显示。
+
+11-20 周三
+1、react父组件调用子组件的方法，在父组件定义子组件时中传递一个参数childEvent={this.childEvent}，在子组件挂载时调用this.props.childEvent(this);在父组件中的childEvent方法中传递的参数即为子组件本身，将其保存在一个变量中，即可利用该变量调用子组件的方法。
+
+11-21 周四
+1、openlayers在sphere.js文件中可以计算球面多边形的面积和长度，公式没怎么看懂。
+2、在geoserver对影像进行切片时，报错"设备存储空间不够"，虽然硬盘上还有空间，但是inode却用完了，inode大小表示硬盘可以存储都少个文件。由于切片过多，导致虽然还有存储空间但不能放文件了。因此将之前的切片64x64的，进行重新切片，256x256，就可以存储更多文件。并且没有偏移。生成jpeg格式，加载速度很快，就是有空白背景。
+
+11-22 周五
+1、查看react官方文档，了解hook特性。react的hook即可以在函数式编程下使用react组件，不需要定义class，通过userState以及useEffect方法定义以及更新state，之后可以在组件中多使用hook函数。
+2、网页视频的下载，一般的网站视频，较小的直接以mp4文件播放，可以在浏览器的network中找到该文件下载下来；较大的视频文件则将整个视频分为多个小的.ts文件，可以将每个小的.ts文件下载下来进行合并拼接。优酷网站的视频没有mp4文件或是ts文件可以找到m3u8文件，其中包含了所有碎片视频的地址，可以找到前边共同的url，在浏览器中打开，就可以下载。
+3、可以使用ffmpeg库对视频文件进行操作，截取视频、转换格式、图片拼接成视频等等操作。
+
+11-25 周一
+1、使用geoserver发布dem数据，需要对其进行渲染。在geoserver中新建一个style，复制一个模板，只修改对应值的颜色，根据dem的数据范围，这里创建了三种数值颜色渲染：-100->#ADFF2F、5000->#EEEE00以及1100->#FF4500。
+
+
+11-27 周三
+1、学习使用redux管理react状态，因为随着项目的扩大，各组件之间交互复杂，可以使用eventEmtter构建订阅模式；使用redux也是一种解决办法。首先安装，npm install redux react-redux --save。
+1)、创建store，一个应用中只包含一个store，需要在入口文件中创建，以便没有组件都可以获取到store的引用。创建store时需要传入一个函数，即为reducer，reducer中定义了state以及action，不同的action进行不同state的操作。reducer接收先前的state和action返回新的state。reducer可以有多个，管理不同的state。
+2)、在组件中触发修改state的方法为，store.dispatch(action)，
+
+11-28 周四
+1、获取gps接收机，使用nodejs搭建server，首先创建的http连接，通过浏览器以及postman都可以连接；但是gps接收机建立的是socket连接，因此需要使用nodejs创建socket类型的服务器。探究一下socket以及http连接不同。http是在应用层使用的，比如软件获取api就是使用的http；http建立在tcp/ip协议上的，属于短连接，服务器只能被动监听请求，收到请求发送响应。处理完请求就会自动断开，不过随着发展http支持多请求同时访问，以及keep-alive可以保持http连接。socket连接属于长连接以及主动双向通信，客户端可以主动发送请求，服务端也可以主动发送数据。在nodejs中socket属于net库。
+gps接收器会创建连接，发送一两次数据，然后断开连接，重现连接服务器。
+
+12月28日 周六
+1、阿里云运行nodejs文件nohup node example.js >> output.log 2>&1 &，然后exit就不会退出运行。
+2、Ubuntu系统下home存储空间不足，将npm缓存移动到/usr/local/npm_cache下，需要设置npm config set cache "xxxx/xxx";home下的.androidStudio以及.gradle占用空间大，将其移动到/usr/myConfig下，修改Android bin目录下的idea.properties,实现对.androidStudio修改。通过设置gradle_user_home的path，修改gradle.properties实现对gradle的修改。
+3、安装centos7双系统，1、制作U盘启动，2、F12进入boot使用U盘启动，
+
+12月31日 周二
+1、今天是2019年最后一天，早上看了一部分Threejs书籍，不清楚Threejs应用场景，现在没有找到我使用它的方向。
+2、学习docker，
+
+2020 1月5号 周天
+1、根据官网教程学习了flutter，在pad端运行示例。
+2、学习了react-native,采用npx react-native init ***创建项目；npx react-native run-android启动安装软件；:然后启动react-native服务器，react-native start；通过浏览器打开localhost:8081/debugger-ui，可以通过按钮进行重新加载
+
+2020 1月8号 周三
+1、采用docker安装nginx，
+	1)查询并拉取nginx镜像：docker search nginx --> docker pull nginx:latest.
+	2)创建容器：docker run
+				--name myNginx
+				-p 8090:80 
+				-v /home/djxc/2019/nginx/html:/usr/share/nginx/html
+				-v /home/djxc/2019/nginx/log:/var/log/nginx
+				-v /home/djxc/2019/nginx/conf:/etc/nginx
+				-d nginx	
+	-i表示运行容器;
+	-t表示进入容器终端;
+	-d 表示后台运行；
+	-p表示本地端口映射容器端口;
+	-v 表示本地文件挂载到容器组件，其中html为资源文件，页面、js以及图片等静态资源;配置文件等；log为日志文件；conf为基本的配置文件；	
+	最后容器的镜像,容器为镜像的实例。
+docker关闭nginx容器：docker stop myNginx；重启nginx服务器需要docker start myNginx，不需要加一些配置文件。
+将react项目打包，生成文件在build文件夹中，将其中的文件复制在nginx下的html下的test下，需要配置default.conf文件，
+
+2020 1月9号 周四
+1、为了进行web程序的前后端的分离，将前端react项目的静态资源文件放在nginx服务器下；后台java程序部署在tomcat中；用户只与nginx通信，nginx需要进行反向代理，将涉及到后端操作的请求转发给tomcat。在nginx中设置反向代理，
+	location ^~ /api/ {
+		proxy_pass http://10.249.7.4:8080/aes1.0/;
+	} 
+
+	^~ /api/ 表示匹配以/api/开头的请求，然后将其转到10.249.7.4:8080/aes1.0/下的tomcat服务器，如果proxy_pass不以/结尾则代理的url会携带匹配的/api,即转发的请求变为http://10.249.7.4:8080/aes1.0/api，否则不会携带/api。
+
+
+2020 1月13号 周二
+1、
