@@ -21,24 +21,24 @@
 &emsp;阿里云仓库存储位置为/srv/目录下，因此需要在/srv/目录下进行操作：  
 &emsp;&emsp;1) 首先在git服务器上创建裸仓库 git init --bare xxx.git  
 &emsp;&emsp;2) 修改仓库所有者以及群组为git，chown git xxx.git -R,  chgrp git xxx.git -R  
-&emsp;&emsp;3) 拉取仓库到本地, git clone git@47.105.161.92:/srv/xxx.git  
+&emsp;&emsp;3) 拉取仓库到本地, git clone git@xx.xx.xx.xx:/srv/xxx.git  
 &emsp;每次提交都会需要输入密码，可以将客户机的公钥放入放在git服务器的/home/git/.ssh/authorized_keys,一行一个(需要启用git用户的bash--在/etc/passwd文件git:x:503:503::/home/git:/bin/git-shell改为git:x:503:503::/home/git:/bin/bash，加入公钥之后修改回来，防止git用户登录)。这样提交修改就不用输入密码了。  
 &emsp;生成公钥ssh-keygen -t rsa -C "youremail@example.com"添加公钥，开启git用户的bash，在/home/git/.ssh/authorized_keys中添加公钥  
-### 阿里云账户 用户名: dj_jxc 密   码: 123bhqd321
-### centOS 用户名: root 密   码: 123Dj321 用户名: bhqd 密   码: 123dj321 ip：47.105.161.92
-### geoserver端口8081 用户名：admin 密   码：123dj321 nohup ./start.sh	后台运行geoserver关闭窗口不退出
-### postgresql 端口 用户名: dj 密   码: 123dj321
+
 
 
 # 四、标注工具系统
 
 ## 1、UI
 &emsp;网页前端采用React + Ant Design框架。  
-&emsp;&emsp;1) 构建系统地图显示、数据查看、标注编辑弹出框等用户友好的交互界面。  
+* 1) 构建系统地图显示、数据查看、标注编辑弹出框等用户友好的交互界面。  
 
 ## 2、卫星影像数据显示与管理
 &emsp; 地图显示采用geoserver + Mapbox  
-&emsp;&emsp;1) 通过geoserver将大数据量的卫星数据进行切片，方便大数据量的卫星数据快速加载。  
+* 1) 通过geoserver将大数据量的卫星数据进行切片，方便大数据量的卫星数据快速加载。
+  * 系统需要为用户提供上传以及下载数据接口，用户定义数据存储位置以及数据分组。系统需要提供文件服务器，用户可以创建、修改以及移动文件夹等操作。
+  * 系统自动对上传的数据(大于2M)进行切片处理，通过java操作geoserver实现用户通过简单点击按钮进行自动化切片，发布服务。如果图片较小则不进行切片处理，直接显示实际数据。  
+
 &emsp;&emsp;2) 利用Mapbox库进行地图的加载与显示，提供卫星图像的放大、缩小、拖放等功能；加载显示用户已标注的矢量要素；支持用户在线标注功能，标注可以提供矩形、多边形以及圆形等样式。  
 &emsp;&emsp;3) 提供所有卫星影像数据列表，列表中显示卫星影像详细信息。用户通过点击卫星影像列表，跳转显示该卫星影像数据以及对应的标注数据。  
 ## 3、数据库
