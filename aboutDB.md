@@ -46,6 +46,26 @@
 - 8、**新增字段**：`db.test.update({},{$set:{content:""}},{multi:1})`
 - 9、**删除字段**：`db.test.update({},{$unset:{uname:""}},false,true)`
 - 10、`javascript 大于：db.collection.find({ "field" : { $gt: value } } ); 小于：db.collection.find({ "field" : { $lt: value } } ); 大于等于：db.collection.find({ "field" : { $gte: value } } ); 小于等于：db.collection.find({ "field" : { $lte: value } } ); 查询指定字段：db.collection.find( {}, { id: 1, title: 1 } )`
+- 11、**更新文档**： `db.col.update({'title':'xxx'},{$set:{'title':'MongoDB'}},{multi:true})`
+- 12、**替换文档**：如果_id存在替换之前的文档，如果不存在则插入
+```javascript
+  b.col.save({
+      "_id" : ObjectId("56064f89ade2f21f36b03136"),
+      "title" : "MongoDB",
+      "description" : "MongoDB 是一个 Nosql 数据库",
+      "by" : "Runoob",
+      "url" : "http://www.runoob.com",
+      "tags" : [
+              "mongodb",
+              "NoSQL"
+      ],
+      "likes" : 110
+  })
+````  
+
+- 13、**创建表**：`db.createCollection('collectionName'); `
+- 14、**创建索引**：`db.chongqing.createIndex({"content.title":1, "content.judgementType":1, "content.caseType":1},{background:true})`
+- 15、**查看索引**： `db.chongqing.getIndexes()`
 
 ---
 
@@ -61,3 +81,6 @@
       authority int not null
     );
   ```
+- 3、postgresql查看所有的数据库 `select pg_database.datname, pg_database_size(pg_database.datname) AS size from pg_database;`
+- 4、postgresql切换数据库`\c tree_manage`
+- 5、postgresql显示当前数据库下所有的表格`\d`
