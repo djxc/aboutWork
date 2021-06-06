@@ -4,6 +4,25 @@
 
 - 1、mysql 的连接 `mysql -u root -p`，需要执行该命令的环境中安装 mysql 客户端。
 
+- 2、利用docker安装mysql
+```javascript
+  sudo docker run -p 3306:3306 --name mysql \
+  -v /usr/local/docker/mysql/conf:/etc/mysql \
+  -v /usr/local/docker/mysql/logs:/var/log/mysql \
+  -v /usr/local/docker/mysql/data:/var/lib/mysql \
+  -e MYSQL_ROOT_PASSWORD=123456 \
+  -d mysql:5.7
+```
+- 3、修改字段的数据类型`alter table tableName MODIFY fieldName VARCHAR(10);`
+- 4、按照时间查询：日期相隔一天`SELECT * FROM forest_fire_points_details where TO_DAYS(NOW()) - TO_DAYS(monitorTime) = 1 order by monitorTime desc;`；时间相差24小时`SELECT * FROM forest_fire_points_details where monitorTime >=(NOW() - interval 24 hour) order by monitorTime desc`
+- 5、修改时区
+```javascript
+    > set global time_zone = '+8:00'; ##修改mysql全局时区为北京时间，即我们所在的东8区
+    > set time_zone = '+8:00'; ##修改当前会话时区
+    > flush privileges; #立即生效
+```
+- 6、导出数据库`mysqldump -u 用户名 -p 数据库名 > 导出的文件名`
+- 7、导出数据表`mysqldump -u 用户名 -p 数据库名 表名> 导出的文件名`
 ---
 
 ## 二、mongodb
@@ -47,21 +66,19 @@
 - 9、**删除字段**：`db.test.update({},{$unset:{uname:""}},false,true)`
 - 10、`javascript 大于：db.collection.find({ "field" : { $gt: value } } ); 小于：db.collection.find({ "field" : { $lt: value } } ); 大于等于：db.collection.find({ "field" : { $gte: value } } ); 小于等于：db.collection.find({ "field" : { $lte: value } } ); 查询指定字段：db.collection.find( {}, { id: 1, title: 1 } )`
 - 11、**更新文档**： `db.col.update({'title':'xxx'},{$set:{'title':'MongoDB'}},{multi:true})`
-- 12、**替换文档**：如果_id存在替换之前的文档，如果不存在则插入
+- 12、**替换文档**：如果\_id 存在替换之前的文档，如果不存在则插入
+
 ```javascript
-  b.col.save({
-      "_id" : ObjectId("56064f89ade2f21f36b03136"),
-      "title" : "MongoDB",
-      "description" : "MongoDB 是一个 Nosql 数据库",
-      "by" : "Runoob",
-      "url" : "http://www.runoob.com",
-      "tags" : [
-              "mongodb",
-              "NoSQL"
-      ],
-      "likes" : 110
-  })
-````  
+b.col.save({
+  _id: ObjectId("56064f89ade2f21f36b03136"),
+  title: "MongoDB",
+  description: "MongoDB 是一个 Nosql 数据库",
+  by: "Runoob",
+  url: "http://www.runoob.com",
+  tags: ["mongodb", "NoSQL"],
+  likes: 110,
+});
+```
 
 - 13、**创建表**：`db.createCollection('collectionName'); `
 - 14、**创建索引**：`db.chongqing.createIndex({"content.title":1, "content.judgementType":1, "content.caseType":1},{background:true})`
@@ -81,6 +98,8 @@
       authority int not null
     );
   ```
-- 3、postgresql查看所有的数据库 `select pg_database.datname, pg_database_size(pg_database.datname) AS size from pg_database;`
-- 4、postgresql切换数据库`\c tree_manage`
-- 5、postgresql显示当前数据库下所有的表格`\d`
+- 3、postgresql 查看所有的数据库 `select pg_database.datname, pg_database_size(pg_database.datname) AS size from pg_database;`
+- 4、postgresql 切换数据库`\c tree_manage`
+- 5、postgresql 显示当前数据库下所有的表格`\d`
+- 6、进入数据库，首先切换用户：`su postgres`, 然后进入数据库的 cli：`psql`
+- 7、postgis 导入 shp 文件到 postgresql 需要在 postgres 用户下：`shp2pgsql -s SRID SHAPEFILE.shp SCHEMA.TABLE | psql -h HOST -d tree_manage -U postgres`，其中-s 为导入的 shp 文件坐标，TABLE 生成的表格；-d 之后的为数据库
