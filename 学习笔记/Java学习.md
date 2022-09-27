@@ -23,6 +23,7 @@
     - [8.2、使用openfegin进行服务调用](#82使用openfegin进行服务调用)
   - [九、Zookeeper学习](#九zookeeper学习)
     - [9.1、Zookeeper目的](#91zookeeper目的)
+  - [十、Maven学习](#十maven学习)
 # 一、kafa学习
 
 ## 一、Kafka学习
@@ -96,3 +97,6 @@ spring:
 ## 九、Zookeeper学习
 ### 9.1、Zookeeper目的
 &emsp;&emsp;Zookeeper用来协调管理分布式的服务，具有简单、可靠、顺序以及快速优点。Zookeeper提供了类似文件系统的znode，不同的是znode可以携带少量数据，用户可以创建、修改、删除znode等操作。当znode被修改之后，Zookeeper可以通知所有监听该znode的用户。Zookeeper用途：数据发布与订阅、负载均衡、命名服务，配置管理，集群管理，分布式锁，队列管理。
+
+## 十、Maven学习
+在springboot项目pom.xml文件中，可以添加外部库的依赖，如果一个springboot项目中包含多个模块，不同模块引用了不同版本的相同依赖则可能会产生不必要的冲突。因此需要在项目根目录下的pom.xml文件中添加dependencyManagement模块，用来指定需要的依赖以及版本，其他子模块使用该依赖时不需要指定版本号，因此实现依赖版本的统一管理。
