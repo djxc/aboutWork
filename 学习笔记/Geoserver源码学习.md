@@ -1,4 +1,17 @@
-# <center> Geoserver学习笔记
+# <center>geoserver学习笔记</center>
+
+- [<center>geoserver学习笔记</center>](#centergeoserver学习笔记center)
+  - [一、	Geoserver简介](#一geoserver简介)
+  - [二、Geoserver页面](#二geoserver页面)
+  - [三、Geoserver源码编译](#三geoserver源码编译)
+  - [四、WMS服务](#四wms服务)
+    - [3.1 GetCapabilities](#31-getcapabilities)
+    - [3.2 GetMap](#32-getmap)
+  - [五、WFS服务](#五wfs服务)
+  - [六、WCS服务](#六wcs服务)
+  - [七、WPS服务](#七wps服务)
+  - [八、自定义开发](#八自定义开发)
+
 
 ## 一、	Geoserver简介
 &emsp;&emsp;Geoserver开始于2001年，是为了政府民主化的产物，使政府更加透明。Geoserver项目开展过程中又建立了GeoTools工具包。PostGIS以及OpenLayers等的出现增强了Geoserver功能。Geoserver的愿景还是使地理数据让所有人可以触及。    
@@ -12,9 +25,10 @@
 
 &emsp;&emsp;Wicket操作类似于jquery，通过元素id获取元素wicket:id="selector"，然后对其进行操作。   
 &emsp;&emsp;Geoserver使用了spring-web进行开发，在main模块下的applicationContext.xml中定义了不同url对应的处理器。如下图对/geoserver/ows请求会首先被OWSHandlerMapping处理，OWSHandlerMapping继承了SimpleUrlHandlerMapping，而	SimpleUrlHandlerMapping又继承了AbstractUrlHandlerMapping，AbstractUrlHandlerMapping具有注册handler的方法registerHandler，将在applicationContext.xml中定义的url与指定的controller类放在map中保存。OWSHandlerMapping即从map中获取与当前url匹配的controller，如果找到则将请求发给该controller，这里的controller即为org.geoserver.ows.Dispatcher.在Dispatcher中会根据请求的参数服务名称在spring容器中查找Service类型的类。利用spring的applicationContext的getBeanNamesForType方法根据类class获取bean名称。然后在根据请求的服务的version将service进行确认，如果没有指定version，则返回版本最高的。然后通过反射机制，调用service对象的请求指定的方法。调用完serveice方法后通过回调进行返回消息。
- 
- 
-## 三、WMS服务
+
+## 三、Geoserver源码编译
+&emsp;&emsp;首先需要下载源码，在github上拉取geoserver源码。用idea打开src文件夹，在命令行中进入src目录下，运行`mvn -DskipTests clean install`跳过test编译项目,编译成功后用idea打开src目录，找到src下的web模块下的app包test下的web运行。也可以在idea中编译先clean然后install，需要选中跳过测试步骤。在idea中运行过程中可以修改data位置，在vm option中添加`-DGEOSERVER_DATA_DIR=D:\Data\geoserver_data`即可。如果编译成功，但运行时报错误，可能是data文件夹下的一些xml配置出现问题，可以将正常的xml文件替换掉有问题的xml文件即可。
+## 四、WMS服务
 &emsp;&emsp;WMS提供http请求获取地理图片服务。WMS服务的优点为，可以从多个服务器获取数据，然后再客户端将这些数据拼接起来。参考地址WMS reference — GeoServer 2.21.x User Manual
 WMS主要提供一下内容   
 
@@ -42,8 +56,8 @@ Geoserver服务请求主要包括三个参数，service指定请求服务类型�
   <img src="../assets/dispatcher_step.png" width="90%">
 </p>
 
-1. 首先在init方法中解析请求参数信息；
-2. 然后在service方法中根据请求中服务名称获取对应的service，查找service具体方法为findService。加载所有的service然后根据当前请求的服务名称以及版本号进行查找符合要求的service。加载所有service操作在loadServices方法中，主要用到spring的ApplicationContext对象getBeanNamesForType方法获取所有Service类型的bean名称。然后在利用bean名称从ApplicationContext中获取对应的bean。每次请求都会进行以上操作，该过程会通过ConcurrentHashMap进行缓存以提高效率。这里找到的service是org.geoserver.wms.DefaultWebMapService。而找到的wms服务提供了10中操作,GetCapabilities、Capabilities、GetMap、Map、DescribeLayer、GetFeatureInfo、GetLegendGraphic、reflect、kml、animate。不同版本的WMS服务提供的操作不同。
+1. 首先在init方法中解析请求参数信息；针对不同的服务会采用不同的解析器，解析器都需要继承KvpParser然后在application.xml中注册到spring中，在KvpUtil中根据请求服务类型、版本号、以及key选择具体的解析器，为了更快的匹配到解析器最好在定义解析器时指定服务类型以及版本号等信息。解析完成的结果仍然放在请求参数map对象中。GeoServerExtensions.extensions方法用来获取spring中指定类型的bean。
+2. 然后在service方法中根据请求中服务名称以及版本号等信息获取对应的service，查找service具体方法为findService。每个服务具体名称、版本信息以及参数等在applicationContext.xml中的xxx-ServiceDescriptor名称的bean为org.geoserver.platform.Service实例中定义。加载所有的service然后根据当前请求的服务名称以及版本号进行查找符合要求的service。加载所有service操作在loadServices方法中，主要用到spring的ApplicationContext对象getBeanNamesForType方法获取所有Service类型的bean名称。然后在利用bean名称从ApplicationContext中获取对应的bean，通过GeoServerExtensions.extensions获取service类型的bean。每次请求都会进行以上操作，该过程会通过ConcurrentHashMap进行缓存以提高效率。这里找到的service是org.geoserver.wms.DefaultWebMapService。而找到的wms服务提供了10中操作,GetCapabilities、Capabilities、GetMap、Map、DescribeLayer、GetFeatureInfo、GetLegendGraphic、reflect、kml、animate。不同版本的WMS服务提供的操作不同。
 
 <p align="center">
   <img src="../assets/WMS_info.png" width="90%">
@@ -64,7 +78,7 @@ GetMap主要业务逻辑定义在package org.geoserver.wms中的GetMap类中。�
 org.geoserver.ows为open web service，其中定义了请求参数，请求解析，以及响应等类。其中Dispatcher继承了AbstractController，会对所有的请求进行拦截处理。GetMap请求会首先被Dispatcher拦截处理，处理请求参数将不同类型的功能处理为对应类型的请求。然后GetMap请求到达DefaultWebMapService类，DefaultWebMapService类判断请求类型，然后调用GetMap类中的run方法。   
 &emsp;&emsp;Geotools加载图层具体流程为首先创建DataStore，然后根据DataStore创建SimpleFeatureSoure，然后利用featureSource创建featureLayer，最后将layer添加到map中。在Geoserver中Dispatcher根据请求的具体类型选择KvpRequestReader进行具体图层读取，GetMap对应的KvpRequestReader为GetMapKvpRequestReader
 在dispatcher中调用了DefaultWebMapService的getMap方法，在getMap方法触发了GetMap中run方法，run方法内首先创建了GeoTools的MapContent对象，这里geoserver新创建了类WebMapContent对象继承了MapContent对象，添加了一些回调监听、参数等。GetMap方法可以用于免切片技术，每次请求都会创建MapContent，添加图层，生成图片等操作。GetMap请求可以分为栅格数据以及矢量数据类型，按照不同的输出格式可以分为openlayers、kml以及RenderImageMap等不同的格式。因此在GetMap类中的run方法中首先根据请求确定输出格式，获取GetMapOutputFormat接口的实现类，该实现类内部将mapcontent中的数据生成图片；接着在executeInternal方法中根据请求图层的类型加载该图层到mapcontent中。在executeInternal中对mapcontent根据请求范围以及坐标系进行设置。最后通过具体的GetMapOutputFormat实现类的produceMap生成WebMap对象。
-## 四、WFS服务
+## 五、WFS服务
 &emsp;&emsp;WFS提供http请求获取、修改以及删除地理矢量数据服务。   
 &emsp;&emsp;WFS主要提供一下内容
 
@@ -79,7 +93,7 @@ org.geoserver.ows为open web service，其中定义了请求参数，请求解�
 示例：
 http://example.com/geoserver/wfs?service=wfs&version=1.1.0&request=GetCapabilities
 
-## 五、WCS服务
+## 六、WCS服务
 &emsp;&emsp;WCS提供http请求处理遥感数据，WMS只是获取图像数据，而WCS会在原始数据上进行一些处理，如图像裁剪、波段运算等。   
 &emsp;&emsp;WCS主要提供一下内容
 
@@ -97,3 +111,15 @@ http://www.example.com/wcs?service=wcs&AcceptVersions=1.1.0&request=GetCapabilit
 WPS为地图计算服务，
 http://localhost:8080/geoserver/ows?service=WPS&version=1.0.0&request=GetCapabilities
 CSW为获取Geoserver中catlog中的数据
+
+
+## 七、WPS服务
+
+## 八、自定义开发
+&emsp;&emsp;基于geoserver开发新的功能，在geoserver项目基础上开发新的功能模块，不影响现有的功能，需要以下几步：
+- 1.创建模块   
+&emsp;&emsp;在项目src目录下，新建一个maven模块取名为djdemo，修改djdemo模块pom.xml文件指定其父模块为org.geoserver;然后在web-app模块中依赖新建的模块。在新建的模块中添加需要引用的geoserver模块。
+- 2.创建所需的类    
+&emsp;&emsp;需要创建的类为新功能的主体类，处理具体的业务逻辑；请求解析类，将请求参数解析为具体的对象；响应封装类，封装处理结果，交给geoserver。这里定义了GPService类，里面包含具体的方法：getLengths以及getBuffers；定义解析请求参数的解析器，需要继承ows模块下的KvpParser，为了让spring找到该类；定义请求与响应类，响应需要继承ows模块下的response。
+- 3.将其注入到spring中   
+&emsp;&emsp;为了让spring管理新模块下的类，需要将其注入到spring中，在java目录下创建applicationContext.xml文件，将第二步创建的类需要放在spring的都要在xml文件中添加，以及依赖的geoserver中其他的bean。这里定义了gpService指向GPService，以及org.geoserver.platform.Service（用来描述gpService，其中包括服务类，服务名称以及版本号，还包括服务的具体方法），方便spring找到gpService；还有解析参数的类。

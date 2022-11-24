@@ -6,7 +6,10 @@
 <p align="center">
   <img src="../assets/osgeo4w-install.jpg" width="90%">
 </p>
-### 1.2	qt的单独安装
+
+### 1.2 vs2017安装
+&emsp;&emsp;由于在qt中采用了msvc需要安装vs，可以根据具体版本安装。安装完vs之后即可在qtcreator中选项对话框中查看编译器
+### 1.2 qt的单独安装
 &emsp;&emsp;在步骤1中安装目录下包含了qt，尝试过VS下进行qt+qgis开发，一直有各种问题，然后重新下载了qt，用qtcreator成功运行qgis程序。首先需要在qtcreator中测试可以正常启动widgets项目，qt版本采用独立安装的qt，最好不用osgeo4w安装的qt。然后配置qgis依赖，在项目pro文件中添加以下（具体路径按实际情况修改）：
 ```yml
 # qgis

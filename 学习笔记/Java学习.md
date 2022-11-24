@@ -1,6 +1,5 @@
-# Java相关学习
-- [Java相关学习](#java相关学习)
-- [一、kafa学习](#一kafa学习)
+# <center>Java相关学习</center>
+- [<center>Java相关学习</center>](#centerjava相关学习center)
   - [一、Kafka学习](#一kafka学习)
     - [1.1、功能](#11功能)
     - [1.2、组成](#12组成)
@@ -24,7 +23,8 @@
   - [九、Zookeeper学习](#九zookeeper学习)
     - [9.1、Zookeeper目的](#91zookeeper目的)
   - [十、Maven学习](#十maven学习)
-# 一、kafa学习
+  - [十一、spring学习](#十一spring学习)
+  - [十二、测试](#十二测试)
 
 ## 一、Kafka学习
 ### 1.1、功能
@@ -100,3 +100,37 @@ spring:
 
 ## 十、Maven学习
 在springboot项目pom.xml文件中，可以添加外部库的依赖，如果一个springboot项目中包含多个模块，不同模块引用了不同版本的相同依赖则可能会产生不必要的冲突。因此需要在项目根目录下的pom.xml文件中添加dependencyManagement模块，用来指定需要的依赖以及版本，其他子模块使用该依赖时不需要指定版本号，因此实现依赖版本的统一管理。
+
+## 十一、spring学习
+
+## 十二、测试
+- web请求性能测试`ab -c 500 -n 10000 http://192.168.31.83/index.html`
+
+## 十三、GRPC
+grpc为google开发的一种grpc协议，采用proto文件定义接口与接口需要的参数，与语言无关，因此可以实现不同语言之间的调用。在不同语言中需要实现proto到该语言的转换，需要安装protoc工具。
+- python创建grpc服务器   
+安装需要的依赖
+```python
+pip install grpcio #gRPC 的安装 
+pip install protobuf  #ProtoBuf 相关的 python 依赖库
+pip install grpcio-tools   #python grpc 的 protobuf 编译工具
+```
+
+然后编写proto文件，运行一下命令解析proto文件，生成py文件
+`python -m grpc_tools.protoc -I. --python_out=./base_package --grpc_python_out=./base_package ./data.proto`
+- java编写grpc客户端调用python服务的方法   
+添加依赖
+```xml
+   <groupId>net.devh</groupId>
+   <artifactId>grpc-spring-boot-starter</artifactId>
+```
+复制proto文件，需要与服务端的一致。通过maven的proto插件解析为java文件。在yml中配置grpc：
+```yml
+grpc:
+  client:
+    userClient:
+      negotiationType: PLAINTEXT
+      address: static://localhost:9091
+  server:
+    port: 9092
+```
