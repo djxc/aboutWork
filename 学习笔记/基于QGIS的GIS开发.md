@@ -18,6 +18,7 @@ INCLUDEPATH += "D:\Program Files (x86)\OSGeo4W64\apps\qgis-ltr\include"
 LIBS += -L"D:\Program Files (x86)\OSGeo4W64\apps\qgis-ltr\lib" -lqgis_core -lqgis_gui
 ```
 &emsp;&emsp;编写qgis示例程序，可能会报error C2065: “M_PI”: 未声明的标识符，则需要在pro中添加DEFINES += _USE_MATH_DEFINES；还有可能报error: C2001: 常量中有换行符错误则需要在pro文件中添加QT += xml  
+
 &emsp;&emsp;至此，在windows下的qtcreator + qt + qgis开发环境安装成功，
 <p align="center">
   <img src="../assets/my-qt-gis.png" width="90%">
