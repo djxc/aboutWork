@@ -1,0 +1,3 @@
+# <center>Web学习</center>
+# cookie
+&emsp;&emsp;由于web采用http请求是无状态的，因此客户端与单一服务器实例不存在绑定关系，可以切换其他的服务器实例。但服务器很难知道当前客户端的信息，因此在客户端保存一些小数据，记录客户的某些信息，在发送请求时携带这些数据，告诉服务器当前客户端的一些信息。这些小数据即为cookie。cookie可以永久保存在客户端或保存设定的期限。按照存储内容可以将cookie分为token类型的cookie以及签名cookie，token的cookie仅保存token，没有具体含义。签名cookie保存的加密后的用户信息，服务端可以进行解密获取用户信息。cookie存在一些属性：expires、path、domain、secure、httponly.cookie存在很多安全隐患如CSRF攻击、恶意cookies、cookie捕获等。cookie是针对站点的，当访问该站点时会携带对应的cookie。
