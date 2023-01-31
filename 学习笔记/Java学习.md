@@ -135,3 +135,7 @@ grpc:
   server:
     port: 9092
 ```
+
+
+## 十四、HotSpot编译
+&emsp;&emsp;hotspot在openjdk中，因此需要从github中获取openjdk源码，编译openjdk即可获取hotspot。安装所需的依赖。
