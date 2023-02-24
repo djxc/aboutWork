@@ -1,0 +1,2 @@
+# mapbox-gl学习
+&emsp;&emsp;mapbox-gl为GIS显示库，在浏览器端利用webgl技术高效的显示地理数据。当前mapbox-gl支持三维显示，可以加载三维模型。渐渐接近与cesium。mapbox-gl源码采用rollup进行打包，源码主要在src目录下。其中css为样式文件；data中定义了一些数据相关的数据结构；geo文件夹定义了各种投影类型以及地理坐标转换工具等地理相关代码；gl文件夹主要为webgl相关定义的基本类；render为渲染基本的图形，如图片，点线面等；shaders定义了用到的着色器；source为定义了各种图层的source；style定义图册显示样式；symbol为显示图标用到的方法；terrain为地形相关；types定义了基本类型；ui为地图显示相关，如地图操作，地图加载的各种事件，相机，marker等。utils为通用的工具方法。
