@@ -78,4 +78,15 @@ Geometry为抽象的数据类型，具体数据类型包括POINT、LINESTRING、
 - 2、GeometryFactory  
 &emsp;&emsp;用来生成Geometry，包括点、线、面、多点、多线以及多面的生成等方法。Geometry为单例模式，所有的geometry都引用同一个GeometryFactory，每新增一个geometry则会将GeometryFactory的refCount增加1，geometry注销refCount减一，refCount为0则删除GeometryFactory。
   - 2.1 
+  
 # JTS
+
+# GDAL
+
+# PostGIS
+
+# QGIS
+
+# libgeotiff
+
+# Geoserver
