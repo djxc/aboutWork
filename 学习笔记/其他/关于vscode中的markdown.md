@@ -37,7 +37,7 @@ let a = 10;
 - 14、mermaid流程图，需要安装markdown preview mermaid support，
 ```mermaid
 graph LR;  
-编写C方法 --> 测试方法
+编写C方法 --测试--> 测试方法
 ```
 
 ```mermaid
