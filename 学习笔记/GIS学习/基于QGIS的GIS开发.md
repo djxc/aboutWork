@@ -4,7 +4,7 @@
 ### 1.1	osgeo4w安装依赖
 &emsp;&emsp;下载osgeo4w安装包，安装过程中，搜索qgis，选择lib下的所有依赖，进行下载，下载速度很慢，很容易失败可以选择不同网址重新尝试。
 <p align="center">
-  <img src="../assets/osgeo4w-install.jpg" width="90%">
+  <img src="../../assets/osgeo4w-install.jpg" width="90%">
 </p>
 
 ### 1.2 vs2017安装
@@ -21,6 +21,6 @@ LIBS += -L"D:\Program Files (x86)\OSGeo4W64\apps\qgis-ltr\lib" -lqgis_core -lqgi
 
 &emsp;&emsp;至此，在windows下的qtcreator + qt + qgis开发环境安装成功，
 <p align="center">
-  <img src="../assets/my-qt-gis.png" width="90%">
+  <img src="../../assets/my-qt-gis.png" width="90%">
 </p>
  

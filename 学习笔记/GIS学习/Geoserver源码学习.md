@@ -1,6 +1,6 @@
 # <center>geoserver学习笔记</center>
 
-- [<center>geoserver学习笔记</center>](#centergeoserver学习笔记center)
+- [geoserver学习笔记](#geoserver学习笔记)
   - [一、	Geoserver简介](#一geoserver简介)
   - [二、Geoserver页面](#二geoserver页面)
   - [三、Geoserver源码编译](#三geoserver源码编译)
@@ -20,7 +20,7 @@
 &emsp;&emsp;Geoserver页面通过wicket框架搭建的，一个html对应一个java类，在java类中包括具体的方法修该设置html中的数据。
 
 <p align="center">
-  <img src="../assets/geoserver-wicket.png" width="90%">
+  <img src="../../assets/geoserver-wicket.png" width="90%">
 </p>
 
 &emsp;&emsp;Wicket操作类似于jquery，通过元素id获取元素wicket:id="selector"，然后对其进行操作。   
@@ -48,19 +48,19 @@ http://localhost:8080/geoserver/wms?service=wms&version=1.1.1&request=GetCapabil
 Geoserver服务请求主要包括三个参数，service指定请求服务类型，version指定服务的版本，同一个服务具有多个版本，request为该服务具体的操作。这里使用的是WMS服务因此指定该服务的类型service=wms，指定版本为1.1.1，操作为GetCapabilites。如果没有指定版本号，默认为最新版本。
 &emsp;&emsp;WMS具体操作在项目wms模块中。在wms模块中的applicationContext.xml文件中，定义了wms的hanlder通过OWSHandlerMapping进行处理，对应的controller为dispatcher，而dispatcher在main模块中的applicationContext.xml中定义。
 <p align="center">
-  <img src="../assets/wms-applicationxml.png" width="90%">
+  <img src="../../assets/wms-applicationxml.png" width="90%">
 </p>
 
 请求首先进入OWSHandlerMapping中，找到对应的controller，如果在handler中没有找到会在DispatcherServlet中寻找。找到controller即为dispatcher。在dispatcher中handleRequestInternal方法中处理请求。    
 <p align="center">
-  <img src="../assets/dispatcher_step.png" width="90%">
+  <img src="../../assets/dispatcher_step.png" width="90%">
 </p>
 
 1. 首先在init方法中解析请求参数信息；针对不同的服务会采用不同的解析器，解析器都需要继承KvpParser然后在application.xml中注册到spring中，在KvpUtil中根据请求服务类型、版本号、以及key选择具体的解析器，为了更快的匹配到解析器最好在定义解析器时指定服务类型以及版本号等信息。解析完成的结果仍然放在请求参数map对象中。GeoServerExtensions.extensions方法用来获取spring中指定类型的bean。
 2. 然后在service方法中根据请求中服务名称以及版本号等信息获取对应的service，查找service具体方法为findService。每个服务具体名称、版本信息以及参数等在applicationContext.xml中的xxx-ServiceDescriptor名称的bean为org.geoserver.platform.Service实例中定义。加载所有的service然后根据当前请求的服务名称以及版本号进行查找符合要求的service。加载所有service操作在loadServices方法中，主要用到spring的ApplicationContext对象getBeanNamesForType方法获取所有Service类型的bean名称。然后在利用bean名称从ApplicationContext中获取对应的bean，通过GeoServerExtensions.extensions获取service类型的bean。每次请求都会进行以上操作，该过程会通过ConcurrentHashMap进行缓存以提高效率。这里找到的service是org.geoserver.wms.DefaultWebMapService。而找到的wms服务提供了10中操作,GetCapabilities、Capabilities、GetMap、Map、DescribeLayer、GetFeatureInfo、GetLegendGraphic、reflect、kml、animate。不同版本的WMS服务提供的操作不同。
 
 <p align="center">
-  <img src="../assets/WMS_info.png" width="90%">
+  <img src="../../assets/WMS_info.png" width="90%">
 </p>
 
 3. 获取请求操作对应的service中的方法，在dispatch方法中利用反射机制获取请求中request对应的方法这里即为GetCapabilites，获取到方法之后在组织方法所需的参数。Dispatch方法返回Operation对象，其中包含了service，method以及method所需的参数等信息。

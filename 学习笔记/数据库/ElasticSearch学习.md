@@ -1,0 +1,2 @@
+# ElasticSearch
+ElasticSearch是一种搜索引擎，可以存储海量数据，对数据创建索引，可以快速查询数据。ElasticSearch是基于倒排索引的，在创建索引时即知道某个关键字被那些文档包含。
