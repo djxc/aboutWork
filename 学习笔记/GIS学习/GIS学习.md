@@ -1,9 +1,22 @@
 # GIS学习
+
+- [GIS学习](#gis学习)
+  - [1.GEOS](#1geos)
+  - [2.JTS](#2jts)
+  - [3.GDAL](#3gdal)
+  - [4.PostGIS](#4postgis)
+  - [5.QGIS](#5qgis)
+  - [6.libgeotiff](#6libgeotiff)
+  - [7.Geoserver](#7geoserver)
+  - [8.GIS数据格式学习](#8gis数据格式学习)
+  - [9.坐标系](#9坐标系)
+
 GIS主要围绕数据运行，主要为数据存储、数据分析、数据显示。
-## GEOS
+
+## 1.GEOS
 &emsp;&emsp;GEOS作为矢量数据相关的库，作为GDAL、qgis以及PostGIS等程序的依赖。GEOS主要用C++以及C进行开发，不过作为JTS的C++/C的实现，所有的算法都现在JTS中进行实现，然后再GEOS中进行扩展。阅读GEOS的源码了解矢量对象的构建以及算法的实现逻辑。从github上拉取[GEOS源码](https://github.com/libgeos/geos/ 'GEOS').   
 &emsp;&emsp;简单分析下源码结构，源码结构如下图所示。  
-![Alt text](../assets/GEOS-code.PNG)
+![Alt text](../../assets/GEOS-code.PNG)
 
 - 1、benchmarks为性能基准测试
 - 2、capi为c语言的接口
@@ -19,7 +32,7 @@ GIS主要围绕数据运行，主要为数据存储、数据分析、数据显�
 - 12、web为官网的页面
 
 虽然有很多文件夹，我们主要需要阅读的仅为src下的文件。然后我们具体查看下src文件夹下的具体代码。  
-![Alt text](../assets/GEOS-code-src.PNG)
+![Alt text](../../assets/GEOS-code-src.PNG)
 
 - 1、algorithm，从名称看即为算法相关的代码，主要为基础的几何算法，包括角度计算、距离计算、面积计算以及最小外接圆的计算算法等。
 - 2、coverge，为矢量数据的验证，验证几何是否有效，发现几何之间的缝隙等
@@ -79,14 +92,18 @@ Geometry为抽象的数据类型，具体数据类型包括POINT、LINESTRING、
 &emsp;&emsp;用来生成Geometry，包括点、线、面、多点、多线以及多面的生成等方法。Geometry为单例模式，所有的geometry都引用同一个GeometryFactory，每新增一个geometry则会将GeometryFactory的refCount增加1，geometry注销refCount减一，refCount为0则删除GeometryFactory。
   - 2.1 
   
-# JTS
+## 2.JTS
 
-# GDAL
+## 3.GDAL
 
-# PostGIS
+## 4.PostGIS
 
-# QGIS
+## 5.QGIS
 
-# libgeotiff
+## 6.libgeotiff
 
-# Geoserver
+## 7.Geoserver
+
+## 8.GIS数据格式学习
+
+## 9.坐标系

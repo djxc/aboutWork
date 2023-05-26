@@ -32,3 +32,7 @@
 
 - 2 zlib.h
 zlib.h定义了z_stream_s结构体、gz_header_s，zlib用到的重命名的类型在zconf.h声明的。
+
+
+# 编译proj
+在编译proj过程中提示没有curl，但系统中有curl程序。原来proj需要的是curl的so，即动态链接库，而系统中存在的curl是可执行文件。在编译proj中需要curl动态链接库，可执行文件不可在编译了。先尝试从源码编译curl，需要openssh，下载openssh有需要openssl，编译openssl之后，编译epenssh时一直出现错误，openssl与openssh版本不匹配。原来系统中存在两个openssl，具体解决访问未找到。随后通过安装`sudo apt install libcurl4-openssl-dev`,即解决问题。成功编译proj。
