@@ -95,6 +95,8 @@ Geometry为抽象的数据类型，具体数据类型包括POINT、LINESTRING、
 ## 2.JTS
 
 ## 3.GDAL
+- 3.1 GDAL裁剪影像  
+通过gdal.Warp('output_crop_raster.tif', 'input_raster.tif', cutlineDSName='your_vector_layer', cropToCutline=True)，需要输入一个shp、geojson或KML文件即可进行裁剪。
 
 ## 4.PostGIS
 
