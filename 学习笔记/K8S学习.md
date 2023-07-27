@@ -14,3 +14,82 @@ Label定义了这些对象的可识别属性，用来对它们进行管理和选
 用于管理Pod、ReplicaSet，可实现滚动升级和回滚应用、扩容和缩容。
 - 6、service  
 service定义了服务访问入口，pod会随着需求新建摧毁，service会找到其绑定的pod，客户端请求时先到service，然后发送给pod。
+
+
+```yml
+
+apiVersion: apps/v1beta1
+kind: ConfigMap
+metadata:
+  name: nginx-configmap
+data:
+  default.conf: |
+    server {
+        listen       80;
+        listen  [::]:80;
+        server_name  localhost;
+
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+    }
+
+---
+
+apiVersion: apps/v1beta1
+kind: Service
+metadata:
+  labels:
+    app: rs-nginx-service
+  name: rs-nginx-service
+  
+spec:
+  ports:
+	# 对外暴露的端口
+  - nodePort: 30013
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: rs-nginx-deployment
+	# NodePort类型可以对外暴露端口
+  type: NodePort
+  
+---
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: rs-nginx-deployment
+  labels:
+    app: rs-nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: rs-nginx-deployment
+  template:
+    metadata:
+      labels:
+        app: rs-nginx-deployment
+    spec:
+      containers:
+      - name: rs-nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+      volumeMounts:
+      - name: nginx-config
+        mountPath: "/etc/nginx/conf.d/"
+        readOnly: true
+    volumes:
+    - name: nginx-config
+      configMap:
+        name: nginx-configmap
+```

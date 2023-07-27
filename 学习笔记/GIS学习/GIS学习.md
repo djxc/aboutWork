@@ -10,11 +10,12 @@
   - [7.Geoserver](#7geoserver)
   - [8.GIS数据格式学习](#8gis数据格式学习)
   - [9.坐标系](#9坐标系)
+  - [哨兵数据](#哨兵数据)
 
 GIS主要围绕数据运行，主要为数据存储、数据分析、数据显示。
 
 ## 1.GEOS
-&emsp;&emsp;GEOS作为矢量数据相关的库，作为GDAL、qgis以及PostGIS等程序的依赖。GEOS主要用C++以及C进行开发，不过作为JTS的C++/C的实现，所有的算法都现在JTS中进行实现，然后再GEOS中进行扩展。阅读GEOS的源码了解矢量对象的构建以及算法的实现逻辑。从github上拉取[GEOS源码](https://github.com/libgeos/geos/ 'GEOS').   
+&emsp;&emsp;GEOS作为矢量数据相关的库，作为GDAL、qgis以及PostGIS等程序的依赖。GEOS主要用C++以及C进行开发，不过作为JTS的C++/C的实现，所有的算法都现在JTS中进行实现，然后再GEOS中进行扩展。GEOS提供了空间对象模型以及相关方法：几何模型（点、线、面）、空间关系的判断（是否相交、包含、相邻等）、空间操作（联合、缓冲、面积、长度等测量）、空间索引（R-tree）以及wkt、wkb写入读写。阅读GEOS的源码了解矢量对象的构建以及算法的实现逻辑。从github上拉取[GEOS源码](https://github.com/libgeos/geos/ 'GEOS').GEOS编译，该项目采用cmake结构，先在项目根目录下创建build文件夹，在文件夹中执行`cmake ..`;然后执行`make -j4`;最后安装`sudo make install`,即完成geos编译以及安装。   
 &emsp;&emsp;简单分析下源码结构，源码结构如下图所示。  
 ![Alt text](../../assets/GEOS-code.PNG)
 
@@ -93,7 +94,30 @@ Geometry为抽象的数据类型，具体数据类型包括POINT、LINESTRING、
   - 2.1 
   
 ## 2.JTS
-
+JTS为java版本的库，调试起来简单,可以直接运行example中的程序即可。
+- 1、geom，几何对象
+  - 1.1 coordinate，用来保存2维点，与point不同，point还包含envelope、精度以及空间索引信息。而coordinate仅包含坐标以及获取、修改以及计算距离方法。
+  - 1.2 coordinates，提供操作coordinate方法，如创建coordinate、计算维度等。
+  - 1.3 coordinateArrays，提供操作coordinate数组方法，如与envelope相交的coordinate，计算envelope、提取部分coordinates、比较以及判断是否为ring。
+  - 1.4 coordinateList，coordinate数组，可以防止点重复。
+  - 1.5 envelope，2维矩形。获取长宽，计算面积，扩展范围，计算中心点，是否相交，包含，
+  - 1.6 geometry，表示平面与线的矢量几何。包含很多操作，相交分析，buffer，union，空间关系判断
+  - 1.7 geometryCollection,任意几何类型，维度的geometry集合。
+  - 1.8 geometryFactory，通过coordinate创建不同类型geometry方法。
+  - 1.9 geometryOverlay，空间叠加分析。
+  - 1.10 intersetionMatrix，DE-9IM矩阵，用来判断空间关系。
+  - 1.11 LinearRing，闭合的简单几何形状
+  - 1.12 LinearSegment，两个coordinate代表的线段
+  - 1.13 LineString，多个coordinate线段
+  - 1.14 MultiLineString，多条线
+  - 1.15 MultiPoint，多点
+  - 1.16 MultiPolygon，多多边形
+  - 1.17 Point，点
+  - 1.18 Polygon，多边形
+  - 1.19 Position，节点的位置，左侧、右侧
+  - 1.20 Quadrant，象限
+  - 1.21 Triangle，三角形
+- 2、geomgraph，图形
 ## 3.GDAL
 - 3.1 GDAL裁剪影像  
 通过gdal.Warp('output_crop_raster.tif', 'input_raster.tif', cutlineDSName='your_vector_layer', cropToCutline=True)，需要输入一个shp、geojson或KML文件即可进行裁剪。
@@ -109,3 +133,5 @@ Geometry为抽象的数据类型，具体数据类型包括POINT、LINESTRING、
 ## 8.GIS数据格式学习
 
 ## 9.坐标系
+
+## 哨兵数据
