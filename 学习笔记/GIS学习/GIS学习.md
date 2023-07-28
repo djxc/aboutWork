@@ -117,7 +117,27 @@ JTS为java版本的库，调试起来简单,可以直接运行example中的程�
   - 1.19 Position，节点的位置，左侧、右侧
   - 1.20 Quadrant，象限
   - 1.21 Triangle，三角形
-- 2、geomgraph，图形
+- 2、geomgraph，图形对象
+  - 2.1 Depth，记录了geometry拓扑深度
+  - 2.2 Edge，边
+  - 2.3 GraphComponent 图组件，是所有图对象的父类，每个图组件都携带一个标签，
+  - 2.4 Label，标签表示几何之间拓扑关系
+  - 2.5 Node，节点，具有coordinate以及与之关联的edge
+  - 2.6 NodeFactory，node工厂类，
+  - 2.7 NodeMap，通过coordinate作为索引的node集合。
+- 3、densify
+  - 3.1 Densifier，增稠剂，即将给定的geometry沿着边缘增加额外的顶点，使geometry节点稠密。
+- 4、operation,几何操作
+  - 4.1 buffer，缓冲区分析
+    - 4.1.1 bufferBuild，通过给定的geometry以及精度创建缓冲区，点线面缓冲区都在当前目录下
+    - 4.1.2 bufferOp，缓冲区分析的操作入口
+  - 4.2 distance，计算距离
+    - 4.2.1 distanceOp,计算两个给定geometry距离。
+  - 4.3 linemerge，合并line
+  - 4.4 overlay，两个geometry叠加分析：相交、联合、different
+  - 4.5 relate，判断两个geometry空间关系返回相交矩阵
+  - 4.6 valid，判断geometry是否有效。
+- 5、io，读写不同文件对象，如KML、GML、WKT、WKB
 ## 3.GDAL
 - 3.1 GDAL裁剪影像  
 通过gdal.Warp('output_crop_raster.tif', 'input_raster.tif', cutlineDSName='your_vector_layer', cropToCutline=True)，需要输入一个shp、geojson或KML文件即可进行裁剪。
@@ -131,6 +151,8 @@ JTS为java版本的库，调试起来简单,可以直接运行example中的程�
 ## 7.Geoserver
 
 ## 8.GIS数据格式学习
+- 8.1 Well-Know Text（WKT），表达矢量数据：POINT(0 0)，LINESTRING(0 0,1 1,1 2)以及POLYGON((0 0,4 0,4 4,0 4,0 0),(1 1, 2 1, 2 2, 1 2,1 1))，GEOMETRYCOLLECTION(POINT(2 3),LINESTRING(2 3,3 4))。wkt可读性强
+- 8.2 Well-Known Binary(WKB)，表达矢量数据，wkb采用二进制进行存储，适用于数据传输与存储。
 
 ## 9.坐标系
 
