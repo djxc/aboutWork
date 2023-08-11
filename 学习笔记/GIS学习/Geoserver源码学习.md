@@ -11,6 +11,7 @@
   - [六、WCS服务](#六wcs服务)
   - [七、WPS服务](#七wps服务)
   - [八、自定义开发](#八自定义开发)
+  - [九、GeoServer项目结构](#九geoserver项目结构)
 
 
 ## 一、	Geoserver简介
@@ -123,3 +124,16 @@ CSW为获取Geoserver中catlog中的数据
 &emsp;&emsp;需要创建的类为新功能的主体类，处理具体的业务逻辑；请求解析类，将请求参数解析为具体的对象；响应封装类，封装处理结果，交给geoserver。这里定义了GPService类，里面包含具体的方法：getLengths以及getBuffers；定义解析请求参数的解析器，需要继承ows模块下的KvpParser，为了让spring找到该类；定义请求与响应类，响应需要继承ows模块下的response。
 - 3.将其注入到spring中   
 &emsp;&emsp;为了让spring管理新模块下的类，需要将其注入到spring中，在java目录下创建applicationContext.xml文件，将第二步创建的类需要放在spring的都要在xml文件中添加，以及依赖的geoserver中其他的bean。这里定义了gpService指向GPService，以及org.geoserver.platform.Service（用来描述gpService，其中包括服务类，服务名称以及版本号，还包括服务的具体方法），方便spring找到gpService；还有解析参数的类。
+
+## 九、GeoServer项目结构
+- 1、web模块主要为spring mvc的一些配置以及页面相关组件，采用wicket框架进行UI显示。
+- 2、platform，在geoserver中有service，如WMS、WFS以及WMTS等，这些都属于服务；而服务下又包括Operation，如WMS服务下包括GetCapabilities以及GetMap等操作。geoserver将service以及operation进行抽象，不同的服务以及不同服务下的不同操作都需要继承service以及operation。而这些高级的抽象都在platform中定义的，可以认为platform定义了api规范，其他模块实现或引用这个api。
+- 3、ows（open web server），开发服务，所有的请求都会先进入ows，然后进行参数解析封装，再转发到其他具体的服务，如：WMS、WFS等；最后服务返回结果，ows将结果返回给客户端。ows类似网关概念，所有请求都从这进来，所有的相应也都从这出去。ows主要定义了request、response以及kvparser等。ows中的Dispatcher作为http请求调度员，会对接受的服务进行请求参数解析，根据参数找到指定的service以及operation，然后通过反射机制调用服务下的操作。
+- 4、main，定义了catalog、filter以及系统配置等。catalog中定义了layer、map、workspace、store等概念。
+- 5、wms（web map service），
+- 6、wfs（web feature service），
+- 7、wcs（web coverage service），
+- 8、secuity，安全相关
+- 9、kml，
+- 10、gwc（GeoWebCache），服务缓存
+- 11、extensions，一些扩展功能
