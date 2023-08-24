@@ -108,7 +108,8 @@ spring:
 在springboot项目pom.xml文件中，可以添加外部库的依赖，如果一个springboot项目中包含多个模块，不同模块引用了不同版本的相同依赖则可能会产生不必要的冲突。因此需要在项目根目录下的pom.xml文件中添加dependencyManagement模块，用来指定需要的依赖以及版本，其他子模块使用该依赖时不需要指定版本号，因此实现依赖版本的统一管理。
 
 ## 十一、spring学习
-
+- 1、AbstractController，采用模板设计模式创建的、方便controller实现的父类。其中定义了handleRequest以及handleRequestInternal两个方法，handleRequestInternal是AbstractController子类必须要实现的方法，其参数为请求以及相应对象。
+- 2、ApplicationContext是Spring提供的核心接口，可以用来创建、获取以及管理bean。
 ## 十二、测试
 - web请求性能测试`ab -c 500 -n 10000 http://192.168.31.83/index.html`
 

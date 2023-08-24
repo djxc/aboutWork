@@ -7,6 +7,7 @@
   - [四、WMS服务](#四wms服务)
     - [3.1 GetCapabilities](#31-getcapabilities)
     - [3.2 GetMap](#32-getmap)
+    - [3.3 GetFeatureInfo](#33-getfeatureinfo)
   - [五、WFS服务](#五wfs服务)
   - [六、WCS服务](#六wcs服务)
   - [七、WPS服务](#七wps服务)
@@ -73,15 +74,43 @@ Geoserver服务请求主要包括三个参数，service指定请求服务类型�
 示例： 
 http://localhost:8092/geoserver/webgis/wms?service=WMS&version=1.1.0&request=GetMap&layers=webgis%3Astates&bbox=-124.73142200000001%2C24.955967%2C-66.969849%2C49.371735&width=768&height=330&srs=EPSG%3A4326&styles=&format=image%2Fjpeg
 GetMap接口需要提供参数为，layers为图层名称 + workspace；bbox为图像的显示范围；width为输出图像的宽度；height为输出图像的高度，srs为坐标系；format为图像格式。概略步骤为，利用geotools创建mapContent，然后根据图层名称读取图层数据，将其添加到mapContent中，最后根据图像尺寸以及格式生成图像返回给前端。   
+
+```mermaid
+graph TD;  
+GetMap请求 --> dispatcher解析参数 --> dispatcher路由 --> GetMap具体操作 --> dispatcher处理响应
+```
+
 &emsp;&emsp;Geoserver采用wicket架构进行开发，需要继承wicket下的WebApplication，然后在类中重写goHomePage,跳转到主页面。Wicket一个类与一个html相对应。在html中定义的wicket:message需要在项目的properties文件中找对应的文本，不同语言具有不同的properties文件，因此可以实现页面不同语言的切换。 wicket:id需要对应的java文件中定义的元素进行替换，并定义操作事件。
 GetMap主要业务逻辑定义在package org.geoserver.wms中的GetMap类中。其主要方法如下：
  
 org.geoserver.ows为open web service，其中定义了请求参数，请求解析，以及响应等类。其中Dispatcher继承了AbstractController，会对所有的请求进行拦截处理。GetMap请求会首先被Dispatcher拦截处理，处理请求参数将不同类型的功能处理为对应类型的请求。然后GetMap请求到达DefaultWebMapService类，DefaultWebMapService类判断请求类型，然后调用GetMap类中的run方法。   
 &emsp;&emsp;Geotools加载图层具体流程为首先创建DataStore，然后根据DataStore创建SimpleFeatureSoure，然后利用featureSource创建featureLayer，最后将layer添加到map中。在Geoserver中Dispatcher根据请求的具体类型选择KvpRequestReader进行具体图层读取，GetMap对应的KvpRequestReader为GetMapKvpRequestReader
-在dispatcher中调用了DefaultWebMapService的getMap方法，在getMap方法触发了GetMap中run方法，run方法内首先创建了GeoTools的MapContent对象，这里geoserver新创建了类WebMapContent对象继承了MapContent对象，添加了一些回调监听、参数等。GetMap方法可以用于免切片技术，每次请求都会创建MapContent，添加图层，生成图片等操作。GetMap请求可以分为栅格数据以及矢量数据类型，按照不同的输出格式可以分为openlayers、kml以及RenderImageMap等不同的格式。因此在GetMap类中的run方法中首先根据请求确定输出格式，获取GetMapOutputFormat接口的实现类，该实现类内部将mapcontent中的数据生成图片；接着在executeInternal方法中根据请求图层的类型加载该图层到mapcontent中。在executeInternal中对mapcontent根据请求范围以及坐标系进行设置。最后通过具体的GetMapOutputFormat实现类的produceMap生成WebMap对象。
+在dispatcher中调用了DefaultWebMapService的getMap方法，在getMap方法触发了GetMap中run方法。run方法返回WebMap对象，该对象封装了mimeType、http请求头信息以及WMSWebContent。run方法内首先根据请求输出类型获取指定的GetMapOutputFormat子类，用来输出指定格式的图片。创建了GeoTools的MapContent对象，这里geoserver新创建了类WebMapContent对象继承了MapContent对象，添加了一些回调监听、参数等。GetMap方法可以用于免切片技术，每次请求都会创建MapContent，添加图层，生成图片等操作。GetMap请求可以分为栅格数据以及矢量数据类型，按照不同的输出格式可以分为openlayers、kml以及RenderImageMap等不同的格式。因此在GetMap类中的run方法中首先根据请求确定输出格式，获取GetMapOutputFormat接口的实现类，该实现类内部将mapcontent中的数据生成图片；接着在executeInternal方法中根据请求图层的类型加载该图层到mapcontent中。在executeInternal中对mapcontent根据请求范围以及坐标系进行设置。最后通过具体的GetMapOutputFormat实现类的produceMap生成WebMap对象。
+### 3.3 GetFeatureInfo
+&emsp;&emsp;通过像素点获取指定图层的要素信息, 返回FeatureCollection。GetFeatureInfo请求参数携带了当前视图地理范围、像素位置以及图层等信息。主要逻辑在GetFeatureInfo类处理，会加载identifiers类，根据当前的图层类型选择具体的identifiers对象，有矢量数据的identifier以及删除数据的identifier。identifiers对象中identify方法即可通过位置与图层获取FeatureCollection。
+```js
+http://localhost:8080/geoserver/wms?
+request=GetFeatureInfo
+&service=WMS
+&version=1.1.1
+&layers=topp%3Astates
+&styles=
+&srs=EPSG%3A4326
+&format=image%2Fpng
+&bbox=-145.151041%2C21.73192%2C-57.154894%2C58.961059
+&width=780
+&height=330
+&query_layers=topp%3Astates
+&info_format=text%2Fhtml
+&feature_count=50
+&x=353
+&y=145
+&exceptions=application%2Fvnd.ogc.se_xml
+```
+- 1、对于矢量图层，要素标识类为VectorBasicLayerIdentifier，首先需要将屏幕像素转换为地理坐标或投影坐标，通过bbox以及该范围的像素高宽即可求出每个像素代表的地理坐标大小，然后即可算出点击位置的具体地理位置。在识别要素时还需要以点击点做一点缓冲，即将点转换为以点为中心的正方形区块。如果要求的坐标系与该图层的坐标系不一致则需要进行坐标系转换。
 ## 五、WFS服务
 &emsp;&emsp;WFS提供http请求获取、修改以及删除地理矢量数据服务。   
-&emsp;&emsp;WFS主要提供一下内容
+&emsp;&emsp;不同版本的WFS都会提供以下内容
 
 | 操作	| 含义		|
 | ---- |	----	|	
@@ -90,6 +119,17 @@ org.geoserver.ows为open web service，其中定义了请求参数，请求解�
 | GetFeature |	获取要素，几何信息以及属性信息		|
 | LockFeature |	通过给要素添加锁防止被修改		|
 | Transaction |	编辑要素	|
+
+WFS2.0提供如下：
+| 操作	| 含义		|
+| ---- |	----	|	
+| GetPropertyValue |	通过查询语法查询要素的属性信息		|
+| GetFeatureWithLock |	获取关于要素并设置锁		|
+| CreateStoredQuery |	创建仓库查询		|
+| DropStoredQuery |	删除仓库查询		|
+| ListStoredQueries |	列出仓库查询	|
+| DescribeStoredQueries |	描述仓库查询	|
+
 
 示例：
 http://example.com/geoserver/wfs?service=wfs&version=1.1.0&request=GetCapabilities
@@ -126,13 +166,13 @@ CSW为获取Geoserver中catlog中的数据
 &emsp;&emsp;为了让spring管理新模块下的类，需要将其注入到spring中，在java目录下创建applicationContext.xml文件，将第二步创建的类需要放在spring的都要在xml文件中添加，以及依赖的geoserver中其他的bean。这里定义了gpService指向GPService，以及org.geoserver.platform.Service（用来描述gpService，其中包括服务类，服务名称以及版本号，还包括服务的具体方法），方便spring找到gpService；还有解析参数的类。
 
 ## 九、GeoServer项目结构
-- 1、web模块主要为spring mvc的一些配置以及页面相关组件，采用wicket框架进行UI显示。
+- 1、web模块主要为spring mvc的一些配置以及页面相关组件，采用wicket框架进行UI显示。在web模块下的app模块中web.xml中规定了在每个模块下加载applicationContext.xml文件，来初始化bean。
 - 2、platform，在geoserver中有service，如WMS、WFS以及WMTS等，这些都属于服务；而服务下又包括Operation，如WMS服务下包括GetCapabilities以及GetMap等操作。geoserver将service以及operation进行抽象，不同的服务以及不同服务下的不同操作都需要继承service以及operation。而这些高级的抽象都在platform中定义的，可以认为platform定义了api规范，其他模块实现或引用这个api。
-- 3、ows（open web server），开发服务，所有的请求都会先进入ows，然后进行参数解析封装，再转发到其他具体的服务，如：WMS、WFS等；最后服务返回结果，ows将结果返回给客户端。ows类似网关概念，所有请求都从这进来，所有的相应也都从这出去。ows主要定义了request、response以及kvparser等。ows中的Dispatcher作为http请求调度员，会对接受的服务进行请求参数解析，根据参数找到指定的service以及operation，然后通过反射机制调用服务下的操作。
+- 3、ows（OGC Web Services），开发服务，所有的请求都会先进入ows，然后进行参数解析封装，再转发到其他具体的服务，如：WMS、WFS等；最后服务返回结果，ows将结果返回给客户端。ows类似网关概念，所有请求都从这进来，所有的相应也都从这出去。ows主要定义了request、response以及kvparser等。ows中的Dispatcher作为http请求调度员，会对接受的服务进行请求参数解析，根据参数找到指定的service以及operation，然后通过反射机制调用服务下的操作。
 - 4、main，定义了catalog、filter以及系统配置等。catalog中定义了layer、map、workspace、store等概念。
-- 5、wms（web map service），
-- 6、wfs（web feature service），
-- 7、wcs（web coverage service），
+- 5、wms（web map service），网络地图服务
+- 6、wfs（web feature service），网络要素服务
+- 7、wcs（web coverage service），网络覆盖服务
 - 8、secuity，安全相关
 - 9、kml，
 - 10、gwc（GeoWebCache），服务缓存
